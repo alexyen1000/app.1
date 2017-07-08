@@ -29,6 +29,61 @@
   <script>
     var viewer = new Cesium.Viewer('cesiumContainer');
 
+
+    var data = {
+      "results": [
+        {
+          "geo": {
+            "countryName": "Aaa",
+            "countryCode": "aaa",
+            "latitude": 100,
+            "longitude": 10,
+            "cityName": "denver"
+          }, 
+          "nodes": {
+            "services": {
+              "n1ql": 2,
+              "kv": 4
+            }
+          },
+          "version": "1.2.3-enterprise"
+        },
+        {
+          "geo": {
+            "countryName": "Bbb",
+            "countryCode": "bbb",
+            "latitude": 200,
+            "longitude": 20,
+            "cityName": "paris"
+          }, 
+          "nodes": {
+            "services": {
+              "n1ql": 1,
+              "kv": 1
+            }
+          },
+          "version": "1.2.3-enterprise"
+        }
+      ]
+    }
+
+    console.log(data)
+
+    var i = 0;
+    while (i < data.results.length) {
+      var redEllipse = viewer.entities.add({
+        position: Cesium.Cartesian3.fromDegrees(data.results[i].geo.latitude, data.results[i].geo.longitude),
+        name : 'Red ellipse on surface',
+        ellipse : {
+            semiMinorAxis : 10000.0,
+            semiMajorAxis : 10000.0,
+            extrudedHeight : 2000000,
+            material : Cesium.Color.BLUE.withAlpha(1)
+        }
+      });
+      i = i + 1
+    }
+
     var i = 0;
     while (i < 36) {
       var redEllipse = viewer.entities.add({
@@ -43,7 +98,6 @@
       });
       i = i + 1
     }
-    
   </script>
   <style type="text/css">
   .stage {
