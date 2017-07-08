@@ -17,9 +17,27 @@
   </style>
 </head>
 <body>
-  <div id="cesiumContainer"></div>
+  <div class="stage">
+    <div id="globalInformation">This is where info is so if i were to make this longer</div>
+
+    <div class="leftSide">
+      <div id="cesiumContainer"></div>
+      <div id="localInformation">This is where detailed info is</div>
+    </div>
+
+  </div>
   <script>
     var viewer = new Cesium.Viewer('cesiumContainer');
   </script>
+  <style type="text/css">
+  .stage {
+    display: flex;
+    flex-direction: row-reverse;
+  }
+  .leftSide {
+    flex-direction: column;
+  }
+  
+  </style>
 </body>
 </html>

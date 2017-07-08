@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UFT-8">
+    <title>App</title>
+</head>
+ 
+<p id="demo1"></p>
+<p id ="demo2"></p>
+<p id ="demo3"></p>
+<p id ="demo4"></p>
+ 
+<body>
+ 
+    <script type="text/javascript">
+        document.getElementById("demo1").innerHTML = "Global Status";
+        document.getElementById("demo2").innerHTML = "N1QL:";
+        document.getElementById("demo3").innerHTML = "KV:";
+        document.getElementById("demo4").innerHTML = "Index:";
+ 
+    </script>
+
+    <script>
+        
+ 
+        function loadDoc() {
+            var query = "SELECT COUNT(phonehome.version) AS enterprise FROM phonehome_sample WHERE phonehome.version LIKE '%enterprise'";
+            var object = JSON.stringify( { "statement":query,
+                "creds":[ {
+                "user":"Administrator",
+                "pass":"password"
+                }
+                ]
+                }
+                );
+ 
+            var xhttp = new XMLHttpRequest();
+            xhttp.onreadystatechange = function() {
+                if (this.readyState == 4 && this.status == 200) {
+                    console.log(this.responseText)
+                };
+            };
+                               
+            xhttp.open("POST", "http://172.23.99.8:8093/query/service", true, "Administrator", "password");
+                 
+                                //xhttp.setRequestHeader("Content-Type","application/json");
+                 
+            xhttp.send(object);
+        };
+ 
+        loadDoc();
+ 
+    </script>
+ 
+</body>
+</html>

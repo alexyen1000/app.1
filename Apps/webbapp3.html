@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UFT-8">
+    <title>App</title>
+</head>
+
+<body>
+
+<p id="demo1"></p>
+<p id="demo2"></p>
+<p id="demo3"></p>
+<p id="demo4"></p>
+<p id="demo5"></p>
+
+    <script type="text/javascript">
+        document.getElementById("demo1").innerHTML = "Global Status";
+        document.getElementById("demo2").innerHTML = "N1QL:";
+        document.getElementById("demo3").innerHTML = "KV:";
+        document.getElementById("demo4").innerHTML = "Index:";
+    </script>
+
+
+
+    <script>
+        //this function populates the different values for the queries in function loadDoc
+        function loadValues() {
+
+            //query to find total enterprise customers
+            var query;
+            query = "SELECT COUNT(phonehome.version) AS enterprise FROM phonehome_sample WHERE phonehome.version LIKE \"%enterprise\""
+            //loadDoc(query);
+
+            query = "SELECT SUM(phonehome.nodes.services.n1ql) AS n1qlnodes FROM phonehome_sample"
+            var response = loadDoc(query);
+            console.log("YYY " + response)
+            document.getElementById("demo5").innerHTML = response;
+            
+        };
+
+        function loadDoc(query) {
+
+            console.log(query)
+
+            // Parse the JSON string to send REST API request
+            var json_req = JSON.stringify({
+                "statement": query,
+                "creds": [{
+                    "user": "Administrator",
+                    "pass": "password"
+                }]
+            })
+
+            var xhttp = new XMLHttpRequest();
+            xhttp.onreadystatechange = function() {
+                if (this.readyState >= 3 && this.status == 200) {
+                    var response = JSON.parse(this.responseText)
+                    console.log(response.results[0])
+                    return response.results[0]
+                } else {
+                    // handle query errors here
+                    console.log("responseText: " + this.status);
+                }
+            };
+
+            xhttp.open("POST", "http://172.23.99.8:8093/query/service", true,
+                "Administrator", "password");
+            xhttp.setRequestHeader("Content-Type", "application/json");
+            xhttp.send(json_req);
+        };
+
+        loadValues();
+    </script>
+
+</body>
+
+</html>
