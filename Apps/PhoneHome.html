@@ -17,6 +17,7 @@
   </style>
 </head>
 <body>
+  <!--Splits into 3 windows-->
   <div class="stage">
     <div id="globalInformation">This is where info is so if i were to make this longer</div>
 
@@ -27,7 +28,7 @@
 
   </div>
   <script>
-    var viewer = new Cesium.Viewer('cesiumContainer');
+    var viewer = new Cesium.Viewer('cesiumContainer', {timeline : false, animation : false});
 
 
     var data = {
@@ -68,7 +69,7 @@
     }
 
     console.log(data)
-
+    //Plot lat/lon of test data above
     var i = 0;
     while (i < data.results.length) {
       var redEllipse = viewer.entities.add({
@@ -77,27 +78,41 @@
         ellipse : {
             semiMinorAxis : 10000.0,
             semiMajorAxis : 10000.0,
-            extrudedHeight : 2000000,
+            
             material : Cesium.Color.BLUE.withAlpha(1)
         }
       });
       i = i + 1
     }
-
+    //Adds cylinders to the top
     var i = 0;
-    while (i < 36) {
-      var redEllipse = viewer.entities.add({
-        position: Cesium.Cartesian3.fromDegrees(10 * i, 40),
-        name : 'Red ellipse on surface',
-        ellipse : {
-            semiMinorAxis : 10000.0,
-            semiMajorAxis : 10000.0,
-            extrudedHeight : 200000 * i,
-            material : Cesium.Color.RED.withAlpha(1)
+    while (i < 10) {
+      var redBox = viewer.entities.add({
+        position: Cesium.Cartesian3.fromDegrees(i, 40),
+        name : 'Red square on surface',
+        box : {
+            dimensions : new Cesium.Cartesian3(10000, 10000, 10),
+            material : Cesium.Color.RED
         }
       });
       i = i + 1
     }
+
+    var pinBuilder = new Cesium.PinBuilder();
+
+    var i = 0;
+    while (i < 1000) {
+      var bluePin = viewer.entities.add({
+        name : 'Blank blue pin',
+        position : Cesium.Cartesian3.fromDegrees(i * 0.1, -30),
+        billboard : {
+          image : pinBuilder.fromColor(Cesium.Color.ROYALBLUE, 48).toDataURL(),
+          verticalOrigin : Cesium.VerticalOrigin.BOTTOM
+        }
+      });
+      i = i + 1
+    }
+      
   </script>
   <style type="text/css">
   .stage {
@@ -107,7 +122,9 @@
   .leftSide {
     flex-direction: column;
   }
-  
+  .cesium-viewer-bottom .cesium-widget-credits {
+    display: none;
+  }
   </style>
 </body>
 </html>
