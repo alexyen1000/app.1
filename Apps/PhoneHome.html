@@ -30,7 +30,6 @@
   <script>
     var viewer = new Cesium.Viewer('cesiumContainer', {timeline : false, animation : false});
 
-
     var data = {
       "results": [
         {
@@ -69,21 +68,23 @@
     }
 
     console.log(data)
+
     //Plot lat/lon of test data above
     var i = 0;
     while (i < data.results.length) {
       var redEllipse = viewer.entities.add({
         position: Cesium.Cartesian3.fromDegrees(data.results[i].geo.latitude, data.results[i].geo.longitude),
-        name : 'Red ellipse on surface',
+        name : 'Blue ellipse on surface',
         ellipse : {
-            semiMinorAxis : 10000.0,
-            semiMajorAxis : 10000.0,
+            semiMinorAxis : 50000.0,
+            semiMajorAxis : 50000.0,
             
             material : Cesium.Color.BLUE.withAlpha(1)
         }
       });
       i = i + 1
     }
+
     //Adds cylinders to the top
     var i = 0;
     while (i < 10) {
@@ -91,29 +92,33 @@
         position: Cesium.Cartesian3.fromDegrees(i, 40),
         name : 'Red square on surface',
         box : {
-            dimensions : new Cesium.Cartesian3(10000, 10000, 10),
+            dimensions : new Cesium.Cartesian3(10000, 10000, 500000),
             material : Cesium.Color.RED
         }
       });
       i = i + 1
     }
 
-    var pinBuilder = new Cesium.PinBuilder();
-
-    var i = 0;
-    while (i < 1000) {
-      var bluePin = viewer.entities.add({
-        name : 'Blank blue pin',
-        position : Cesium.Cartesian3.fromDegrees(i * 0.1, -30),
-        billboard : {
-          image : pinBuilder.fromColor(Cesium.Color.ROYALBLUE, 48).toDataURL(),
-          verticalOrigin : Cesium.VerticalOrigin.BOTTOM
+    function addPoint(x, y) {
+      viewer.entities.add({
+        position : Cesium.Cartesian3.fromDegrees(x, y),
+        point : {
+            pixelSize : 10,
+            color : Cesium.Color.YELLOW,
+            scaleByDistance : new Cesium.NearFarScalar(1.5e2, 2.0, 1.5e7, 0.5)
         }
       });
+    }
+
+    var i = 0;
+    while (i < 3600) {
+      var r = (Math.random() * 180.0) - 90.0;
+      addPoint(i * 0.1, r)
       i = i + 1
     }
-      
+    
   </script>
+
   <style type="text/css">
   .stage {
     display: flex;
