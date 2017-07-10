@@ -8,22 +8,17 @@
 
 <body>
 
-<p id="demo1"></p>
-<p id="demo2"></p>
-<p id="demo3"></p>
-<p id="demo4"></p>
-<p id="demo5"></p>
+Global Status: <p id="demo1"></p>
+N1QL: <pre id="demo2"></pre>
+KV: <p id="demo3"></p>
+Index: <p id="demo4"></p>
 
     <script type="text/javascript">
-        document.getElementById("demo1").innerHTML = "Global Status";
-        document.getElementById("demo2").innerHTML = "N1QL:";
-        document.getElementById("demo3").innerHTML = "KV:";
-        document.getElementById("demo4").innerHTML = "Index:";
-    </script>
+        var globalStatusEl = document.getElementById("demo1");
+        var n1qlEl = document.getElementById("demo2");
+        var kvEl = document.getElementById("demo3");
+        var indexEl = document.getElementById("demo4");
 
-
-
-    <script>
         //this function populates the different values for the queries in function loadDoc
         function loadValues() {
 
@@ -33,14 +28,10 @@
             //loadDoc(query);
 
             query = "SELECT SUM(phonehome.nodes.services.n1ql) AS n1qlnodes FROM phonehome_sample"
-            var response = loadDoc(query);
-            console.log("YYY " + response)
-            document.getElementById("demo5").innerHTML = response;
-            
+            loadDoc(query);
         };
 
         function loadDoc(query) {
-
             console.log(query)
 
             // Parse the JSON string to send REST API request
@@ -57,6 +48,7 @@
                 if (this.readyState >= 3 && this.status == 200) {
                     var response = JSON.parse(this.responseText)
                     console.log(response.results[0])
+                    n1qlEl.innerHTML = JSON.stringify(response.results[0].n1qlnodes, null, 2);
                     return response.results[0]
                 } else {
                     // handle query errors here

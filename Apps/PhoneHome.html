@@ -17,15 +17,20 @@
   </style>
 </head>
 <body>
+
+  <style type="text/css">
+  .stage {
+    display: flex;
+    flex-direction: row-reverse;
+  }
+  .cesium-viewer-bottom .cesium-widget-credits {
+    display: none;
+  }
+  </style>
   <!--Splits into 3 windows-->
   <div class="stage">
     <div id="globalInformation">This is where info is so if i were to make this longer</div>
-
-    <div class="leftSide">
-      <div id="cesiumContainer"></div>
-      <div id="localInformation">This is where detailed info is</div>
-    </div>
-
+    <div id="cesiumContainer"></div>
   </div>
   <script>
     var viewer = new Cesium.Viewer('cesiumContainer', {timeline : false, animation : false});
@@ -96,14 +101,20 @@
 
     //Adds boxes through surface
     var i = 0;
-    while (i < 10) {
-      var redBox = viewer.entities.add({
+    while (i < 100) {
+      var surfacePosition = Cesium.Cartesian3.fromDegrees(4 * i, 40, 0);
+      var heightPosition = Cesium.Cartesian3.fromDegrees(4 * i, 40, 500000);
+
+      var polyline = new Cesium.PolylineGraphics();
+            polyline.material = new Cesium.ColorMaterialProperty(Cesium.Color.RED);
+            polyline.width = new Cesium.ConstantProperty(2);
+            polyline.followSurface = new Cesium.ConstantProperty(false);
+            polyline.positions = new Cesium.ConstantProperty([surfacePosition, heightPosition]);
+
+      var line = viewer.entities.add({
         position: Cesium.Cartesian3.fromDegrees(i, 40),
         name : 'Red square on surface',
-        box : {
-            dimensions : new Cesium.Cartesian3(10000, 10000, 500000),
-            material : Cesium.Color.RED
-        }
+        polyline : polyline
       });
       i = i + 1
     }
@@ -132,18 +143,5 @@
     }
     
   </script>
-
-  <style type="text/css">
-  .stage {
-    display: flex;
-    flex-direction: row-reverse;
-  }
-  .leftSide {
-    flex-direction: column;
-  }
-  .cesium-viewer-bottom .cesium-widget-credits {
-    display: none;
-  }
-  </style>
 </body>
 </html>
