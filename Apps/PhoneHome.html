@@ -29,11 +29,26 @@
   </style>
   <!--Splits into 3 windows-->
   <div class="stage">
-    <div id="globalInformation">This is where info is so if i were to make this longer</div>
+    <div id="globalInformation">This is where info is so if i were to make this longer
+      <button onclick="togglePause()">
+        Pause
+      </button>
+    </div>
     <div id="cesiumContainer"></div>
   </div>
   <script>
     var viewer = new Cesium.Viewer('cesiumContainer', {timeline : false, animation : false});
+
+    var pause = false;
+    function fly() {
+      if (!pause) {
+        viewer.camera.rotate(new Cesium.Cartesian3(0.0, 0.0, 1.0), 0.003)
+      }
+    }
+    function togglePause() {
+      pause = !pause
+    }
+    setInterval(fly, 100)
 
     var data = {
       "results": [
