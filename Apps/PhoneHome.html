@@ -59,7 +59,7 @@
           "nodes": {
             "services": {
               "n1ql": 1,
-              "kv": 1
+              "kv": 4
             }
           },
           "version": "1.2.3-enterprise"
@@ -69,23 +69,32 @@
 
     console.log(data)
 
+    //Adds a description to the two points above
+    function addResult(result) {
+      viewer.entities.add({
+        position : Cesium.Cartesian3.fromDegrees(result.geo.latitude, result.geo.longitude),
+        name : 'Point that scales',
+        description : 
+          'n1ql: ' +  data.results[1].nodes.services.n1ql + '<br/>' +
+          'kv: ' + data.results[1].nodes.services.kv + '<br/>' +
+          '<pre>' + JSON.stringify(result, null, 2) + '</pre>',
+        point : {
+            pixelSize : 10,
+            color : Cesium.Color.YELLOW,
+            scaleByDistance : new Cesium.NearFarScalar(1.5e2, 2.0, 1.5e7, 0.5)
+        }
+      });
+    }
+
     //Plot lat/lon of test data above
     var i = 0;
     while (i < data.results.length) {
-      var redEllipse = viewer.entities.add({
-        position: Cesium.Cartesian3.fromDegrees(data.results[i].geo.latitude, data.results[i].geo.longitude),
-        name : 'Blue ellipse on surface',
-        ellipse : {
-            semiMinorAxis : 50000.0,
-            semiMajorAxis : 50000.0,
-            
-            material : Cesium.Color.BLUE.withAlpha(1)
-        }
-      });
+      addResult(data.results[i])
       i = i + 1
     }
+    //cdn.worldvectorlogo.com/logos/couchbase-1.svg
 
-    //Adds cylinders to the top
+    //Adds boxes through surface
     var i = 0;
     while (i < 10) {
       var redBox = viewer.entities.add({
@@ -102,18 +111,23 @@
     function addPoint(x, y) {
       viewer.entities.add({
         position : Cesium.Cartesian3.fromDegrees(x, y),
+        name : 'Point that scales',
+        description :
+          'n1ql: ' +  data.results[1].nodes.services.n1ql + '<br/>' +
+          'kv: ' + data.results[1].nodes.services.kv + '<br/>',
         point : {
             pixelSize : 10,
-            color : Cesium.Color.YELLOW,
+            color : Cesium.Color.BLUE,
+            //image : 'https://blog.couchbase.com/wp-content/uploads/2017/02/cropped-Couchbase-Blog-lockup.png',
             scaleByDistance : new Cesium.NearFarScalar(1.5e2, 2.0, 1.5e7, 0.5)
         }
       });
     }
 
     var i = 0;
-    while (i < 3600) {
+    while (i < 360) {
       var r = (Math.random() * 180.0) - 90.0;
-      addPoint(i * 0.1, r)
+      addPoint(i, r)
       i = i + 1
     }
     
