@@ -3,6 +3,7 @@
     'use strict';
 
     var express = require('express');
+    var bodyParser = require('body-parser');
     var compression = require('compression');
     var url = require('url');
     var request = require('request');
@@ -55,6 +56,7 @@
         next();
     });
     app.use(express.static(__dirname));
+    app.use(bodyParser.json());
 
     function getRemoteUrlFromParam(req) {
         var remoteUrl = req.params[0];
@@ -91,7 +93,7 @@
         });
     }
 
-    app.get('/proxy/*', function(req, res, next) {
+    app.post('/proxy/*', function(req, res, next) {
         // look for request like http://localhost:8080/proxy/http://example.com/file?query=1
         var remoteUrl = getRemoteUrlFromParam(req);
         if (!remoteUrl) {
@@ -110,6 +112,8 @@
             remoteUrl.protocol = 'http:';
         }
 
+        console.log("proxying request", remoteUrl, req)
+
         var proxy;
         if (upstreamProxy && !(remoteUrl.host in bypassUpstreamProxyHosts)) {
             proxy = upstreamProxy;
@@ -117,9 +121,11 @@
 
         // encoding : null means "body" passed to the callback will be raw bytes
 
-        request.get({
+        request.post({
             url : url.format(remoteUrl),
             headers : filterHeaders(req, req.headers),
+            body : JSON.stringify(req.body),
+            form : req.form,
             encoding : null,
             proxy : proxy
         }, function(error, response, body) {
