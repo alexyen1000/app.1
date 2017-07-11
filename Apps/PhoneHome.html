@@ -56,7 +56,7 @@
     }
     setInterval(fly, 75)
 
-    var data = {
+    var data1 = {
       "results": [
         {
           "geo": {
@@ -93,16 +93,26 @@
       ]
     }
 
+    var data = {
+      results: [
+        {"count":1,"latitude":51.508515,"longitude":-0.125487,"uuid":"e25d623ed7fcf009d57c2b57b1504943"},
+        {"count":1,"latitude":51.508515,"longitude":10.125487,"uuid":"e25d623ed7fcf009d57c2b57b1504943"},
+      ]
+    }
+
     console.log(data)
 
     //Adds a description to the two points above
     function addResult(result) {
+      var n1ql = 0
+      var kv = 0
+
       viewer.entities.add({
-        position : Cesium.Cartesian3.fromDegrees(result.geo.latitude, result.geo.longitude),
-        name : 'Point that scales',
+        position : Cesium.Cartesian3.fromDegrees(result.longitude, result.latitude),
+        name : result.uuid,
         description : 
-          'n1ql: ' +  data.results[1].nodes.services.n1ql + '<br/>' +
-          'kv: ' + data.results[1].nodes.services.kv + '<br/>' +
+          'n1ql: ' +  n1ql + '<br/>' +
+          'kv: ' + kv + '<br/>' +
           '<pre>' + JSON.stringify(result, null, 2) + '</pre>',
         point : {
             pixelSize : 10,
@@ -113,12 +123,15 @@
     }
 
     //Plot lat/lon of test data above
-    var i = 0;
-    while (i < data.results.length) {
-      addResult(data.results[i])
-      i = i + 1
+    function addResults(results) {
+      var i = 0;
+      while (i < results.length) {
+        addResult(results[i])
+        i = i + 1
+      }
     }
-    //cdn.worldvectorlogo.com/logos/couchbase-1.svg
+
+    addResults(data.results)
 
     //Adds boxes through surface
     var i = 0;
@@ -140,13 +153,14 @@
       i = i + 1
     }
 
+/*
     function addPoint(x, y) {
       viewer.entities.add({
         position : Cesium.Cartesian3.fromDegrees(x, y),
         name : 'Point that scales',
         description :
-          'n1ql: ' +  data.results[1].nodes.services.n1ql + '<br/>' +
-          'kv: ' + data.results[1].nodes.services.kv + '<br/>',
+          'n1ql: ' +  data1.results[1].nodes.services.n1ql + '<br/>' +
+          'kv: ' + data1.results[1].nodes.services.kv + '<br/>',
         point : {
             pixelSize : 10,
             color : Cesium.Color.BLUE,
@@ -162,11 +176,12 @@
       addPoint(i, r)
       i = i + 1
     }
+*/
     
 
 
 
-
+    var n1qlEl = document.getElementById("demo2");
 
     function loadValues() {
       //query to find total enterprise customers
@@ -174,7 +189,7 @@
       query = "SELECT COUNT(phonehome.version) AS enterprise FROM phonehome_sample WHERE phonehome.version LIKE \"%enterprise\""
       //loadDoc(query);
 
-      query = "SELECT SUM(phonehome.nodes.services.n1ql) AS n1qlnodes FROM phonehome_sample"
+      query = "SELECT phonehome.uuid, phonehome.geo.latitude, phonehome.geo.longitude, COUNT(*) AS count FROM phonehome_sample GROUP BY phonehome.uuid, phonehome.geo.latitude, phonehome.geo.longitude ORDER BY phonehome.uuid ASC"
       loadDoc(query);
     };
 
@@ -199,6 +214,8 @@
           var response = JSON.parse(this.responseText)
           console.log("response: " + response.results[0])
           console.log(response.results[0])
+          n1qlEl.innerHTML = JSON.stringify(response.results[0], null, 2);
+          addResults(response.results);
           return response.results[0]
         } else {
           // handle query errors here
@@ -210,7 +227,6 @@
       xhttp.setRequestHeader("Content-Type", "application/json");
       xhttp.send(json_req);
     };
-
     loadValues();
   </script>
 </body>
