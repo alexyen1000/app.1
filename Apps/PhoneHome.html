@@ -56,6 +56,7 @@
     }
     setInterval(fly, 75)
 
+  /*
     var data1 = {
       "results": [
         {
@@ -92,66 +93,46 @@
         }
       ]
     }
+*/
 
-    var data = {
-      results: [
-        {"count":1,"latitude":51.508515,"longitude":-0.125487,"uuid":"e25d623ed7fcf009d57c2b57b1504943"},
-        {"count":1,"latitude":51.508515,"longitude":10.125487,"uuid":"e25d623ed7fcf009d57c2b57b1504943"},
-      ]
-    }
+    //Function for plotting points
+    var n1ql = 0
+    var kv = 0
 
-    console.log(data)
-
-    //Adds a description to the two points above
     function addResult(result) {
-      var n1ql = 0
-      var kv = 0
+      var surfacePosition = Cesium.Cartesian3.fromDegrees(result.longitude, result.latitude, 0);
+      var heightPosition = Cesium.Cartesian3.fromDegrees(result.longitude, result.latitude, Math.sqrt(result.count) * 750000);
+      var color = Cesium.Color.fromHsl((0.55 - (result.count * 0.005)), 1.0, 0.5);
 
-      viewer.entities.add({
-        position : Cesium.Cartesian3.fromDegrees(result.longitude, result.latitude),
+      var polyline = new Cesium.PolylineGraphics();
+            polyline.material = new Cesium.ColorMaterialProperty(color);
+            polyline.width = new Cesium.ConstantProperty(2.5);
+            polyline.followSurface = new Cesium.ConstantProperty(false);
+            polyline.positions = new Cesium.ConstantProperty([surfacePosition, heightPosition]);
+
+      var line = viewer.entities.add({
+        position: Cesium.Cartesian3.fromDegrees(i, 40),
         name : result.uuid,
         description : 
           'n1ql: ' +  n1ql + '<br/>' +
           'kv: ' + kv + '<br/>' +
           '<pre>' + JSON.stringify(result, null, 2) + '</pre>',
-        point : {
-            pixelSize : 10,
-            color : Cesium.Color.YELLOW,
-            scaleByDistance : new Cesium.NearFarScalar(1.5e2, 2.0, 1.5e7, 0.5)
-        }
+        polyline : polyline
       });
+      
     }
-
-    //Plot lat/lon of test data above
+    var i = 0;
+    //Plot lat/lon of phonehome data
     function addResults(results) {
-      var i = 0;
       while (i < results.length) {
         addResult(results[i])
         i = i + 1
       }
     }
 
-    addResults(data.results)
-
-    //Adds boxes through surface
+    //Adds polylines through a ring
     var i = 0;
-    while (i < 100) {
-      var surfacePosition = Cesium.Cartesian3.fromDegrees(4 * i, 40, 0);
-      var heightPosition = Cesium.Cartesian3.fromDegrees(4 * i, 40, 500000);
-
-      var polyline = new Cesium.PolylineGraphics();
-            polyline.material = new Cesium.ColorMaterialProperty(Cesium.Color.RED);
-            polyline.width = new Cesium.ConstantProperty(2);
-            polyline.followSurface = new Cesium.ConstantProperty(false);
-            polyline.positions = new Cesium.ConstantProperty([surfacePosition, heightPosition]);
-
-      var line = viewer.entities.add({
-        position: Cesium.Cartesian3.fromDegrees(i, 40),
-        name : 'Red square on surface',
-        polyline : polyline
-      });
-      i = i + 1
-    }
+    
 
 /*
     function addPoint(x, y) {
