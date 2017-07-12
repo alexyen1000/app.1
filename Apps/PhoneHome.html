@@ -14,6 +14,26 @@
       html, body, #cesiumContainer {
           width: 100%; height: 100%; margin: 0; padding: 0; overflow: hidden;
       }
+
+      body {
+        background-color: white;
+      }
+
+      h1{
+        margin-top: 10px;
+        margin-bottom: 0px;
+        color: black;
+        padding-top: 10px;
+        padding-bottom: 10px;
+        text-align: center;
+        background-color: rgb(242, 242, 242);
+        font-family: verdana;
+        font-size: 20px;
+      }
+
+      image {
+      }
+
   </style>
 </head>
 <body>
@@ -29,13 +49,18 @@
 
   <!--Splits into 2 panels-->
   <div class="stage", style="height:100%">
-
-    <div id="globalInformation">This is where info is so if i were to make this longer
+    <div>
+      <image>
+        <img src="https://cdn.worldvectorlogo.com/logos/couchbase.svg" alt="logo" width=400 height="50">
+      </image>
+      <h1>Global Information</h1>
+      <svg height="25" width=100%>
+        <line x1="0" y1="0" x2=100% y2="0" style="stroke:rgb(240, 2, 73);stroke-width:4" />
+      </svg>
       <button onclick="togglePause()">
         Pause
       </button>
-      Global Status: <p id="demo1"></p>
-      N1QL: <pre id="demo2"></pre>
+      <p> N1QL: <pre id="demo2"></pre></p>
       KV: <p id="demo3"></p>
       Index: <p id="demo4"></p>
     </div>
@@ -44,7 +69,7 @@
 
   <script>
     var viewer = new Cesium.Viewer('cesiumContainer', {timeline : false, animation : false});
-    var cameraHeight = viewer.camera.positionCartographic.height;
+    var cameraHeight = viewer.camera.positionCartographic.height - 10000;
     var pause = false;
     function togglePause() {
       pause = !pause
@@ -102,18 +127,20 @@
 
     function addResult(result) {
       var surfacePosition = Cesium.Cartesian3.fromDegrees(result.longitude, result.latitude, 0);
-      var heightPosition = Cesium.Cartesian3.fromDegrees(result.longitude, result.latitude, Math.sqrt(result.count) * 750000);
-      var color = Cesium.Color.fromHsl((0.55 - (result.count * 0.005)), 1.0, 0.5);
+      var heightPosition = Cesium.Cartesian3.fromDegrees(result.longitude, result.latitude, Math.sqrt(result.count) * 1000000);
+      var color = Cesium.Color.fromHsl((1.0 - (result.count * 0.013)), 1.0, 0.5);
+      //Green/blue color shceme: (0.55 - (result.count * 0.013)), 1.0, 0.5
+      //Red/purple color scheme: (1.0 - (result.count * 0.013)), 1.0, 0.5
 
       var polyline = new Cesium.PolylineGraphics();
             polyline.material = new Cesium.ColorMaterialProperty(color);
-            polyline.width = new Cesium.ConstantProperty(2.5);
+            polyline.width = new Cesium.ConstantProperty(3);
             polyline.followSurface = new Cesium.ConstantProperty(false);
             polyline.positions = new Cesium.ConstantProperty([surfacePosition, heightPosition]);
 
       var line = viewer.entities.add({
         position: Cesium.Cartesian3.fromDegrees(i, 40),
-        name : result.uuid,
+        name : result.addr,
         description : 
           'n1ql: ' +  n1ql + '<br/>' +
           'kv: ' + kv + '<br/>' +
@@ -130,9 +157,6 @@
         i = i + 1
       }
     }
-
-    //Adds polylines through a ring
-    var i = 0;
     
 
 /*
@@ -167,12 +191,13 @@
 
     function loadValues() {
       //query to find total enterprise customers
-      var query;
-      query = "SELECT COUNT(phonehome.version) AS enterprise FROM phonehome_sample WHERE phonehome.version LIKE \"%enterprise\""
+      var globalQuery;
+      globalQuery = "SELECT COUNT(phonehome.version) AS enterprise FROM phonehome_sample WHERE phonehome.version LIKE \"%enterprise\""
       //loadDoc(query);
 
-      query = "SELECT phonehome.uuid, phonehome.geo.latitude, phonehome.geo.longitude, COUNT(*) AS count FROM phonehome_sample GROUP BY phonehome.uuid, phonehome.geo.latitude, phonehome.geo.longitude ORDER BY phonehome.uuid ASC"
-      loadDoc(query);
+      var mapQuery;
+      mapQuery = "SELECT phonehome.geo.latitude, phonehome.geo.longitude, phonehome.geo.cityName, phonehome.geo.countryCode, phonehome.nodes.services, phonehome.addr, phonehome.active_version, phonehome.version, phonehome.isEnterpriseEdition, COUNT(*) AS count FROM phonehome_sample GROUP BY phonehome.geo.latitude, phonehome.geo.longitude, phonehome.geo.cityName, phonehome.geo.countryCode, phonehome.nodes.services, phonehome.addr, phonehome.active_version, phonehome.version, phonehome.isEnterpriseEdition ORDER BY phonehome.geo.latitude ASC"
+      loadDoc(mapQuery);
     };
 
     function loadDoc(query) {
