@@ -50,11 +50,11 @@
     }
 
     function fly() {
-      if (!pause) {
-        viewer.camera.rotate(new Cesium.Cartesian3(0.0, 0.0, 1.0), 0.002)
+      if (!pause && viewer.camera.positionCartographic.height >= 25200000) {
+        viewer.camera.rotate(new Cesium.Cartesian3(0.0, 0.0, 1.0), 0.0005)
       }
     }
-    setInterval(fly, 75)
+    setInterval(fly, 20)
 
   /*
     var data1 = {
