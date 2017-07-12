@@ -28,7 +28,8 @@
   </style>
 
   <!--Splits into 2 panels-->
-  <div class="stage">
+  <div class="stage", style="height:100%">
+
     <div id="globalInformation">This is where info is so if i were to make this longer
       <button onclick="togglePause()">
         Pause
@@ -43,14 +44,14 @@
 
   <script>
     var viewer = new Cesium.Viewer('cesiumContainer', {timeline : false, animation : false});
-
+    var cameraHeight = viewer.camera.positionCartographic.height;
     var pause = false;
     function togglePause() {
       pause = !pause
     }
 
     function fly() {
-      if (!pause && viewer.camera.positionCartographic.height >= 25200000) {
+      if (!pause && viewer.camera.positionCartographic.height >= cameraHeight) {
         viewer.camera.rotate(new Cesium.Cartesian3(0.0, 0.0, 1.0), 0.0005)
       }
     }
