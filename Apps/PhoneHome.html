@@ -81,45 +81,6 @@
     }
     setInterval(fly, 20)
 
-  /*
-    var data1 = {
-      "results": [
-        {
-          "geo": {
-            "countryName": "Aaa",
-            "countryCode": "aaa",
-            "latitude": 100,
-            "longitude": 10,
-            "cityName": "denver"
-          }, 
-          "nodes": {
-            "services": {
-              "n1ql": 2,
-              "kv": 4
-            }
-          },
-          "version": "1.2.3-enterprise"
-        },
-        {
-          "geo": {
-            "countryName": "Bbb",
-            "countryCode": "bbb",
-            "latitude": 200,
-            "longitude": 20,
-            "cityName": "paris"
-          }, 
-          "nodes": {
-            "services": {
-              "n1ql": 1,
-              "kv": 4
-            }
-          },
-          "version": "1.2.3-enterprise"
-        }
-      ]
-    }
-*/
-
     //Function for plotting points
     function addResult(result) {
       var surfacePosition = Cesium.Cartesian3.fromDegrees(result.longitude, result.latitude, 0);
