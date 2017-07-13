@@ -65,7 +65,7 @@
           Pause
         </button>
 
-        <p> N1QL: <pre id="demo2"></pre></p>
+        <p> N1QL: <pre id="n1ql"></pre></p>
         KV: <p id="demo3"></p>
         Index: <p id="demo4"></p>
       </div>
@@ -89,9 +89,9 @@
     setInterval(fly, 20)
 
     //Function for plotting points
-    function addResult(result) {
+    function addResult(result, fieldName, factor) {
       var surfacePosition = Cesium.Cartesian3.fromDegrees(result.longitude, result.latitude, 0);
-      var heightPosition = Cesium.Cartesian3.fromDegrees(result.longitude, result.latitude, Math.sqrt(result.count) * 1000000);
+      var heightPosition = Cesium.Cartesian3.fromDegrees(result.longitude, result.latitude, Math.sqrt(result[fieldName]) * factor);
       var color = Cesium.Color.fromHsl((1.0 - (result.count * 0.013)), 1.0, 0.5);
       //Green/blue color shceme: (0.55 - (result.count * 0.013)), 1.0, 0.5
       //Red/purple color scheme: (1.0 - (result.count * 0.013)), 1.0, 0.5
@@ -113,43 +113,14 @@
     }
     var i = 0;
     //Plot lat/lon of phonehome data
-    function addResults(results) {
+    function addResults(results, fieldName, factor) {
       while (i < results.length) {
-        addResult(results[i])
+        addResult(results[i], fieldName, factor)
         i = i + 1
       }
     }
-    
 
-/*
-    function addPoint(x, y) {
-      viewer.entities.add({
-        position : Cesium.Cartesian3.fromDegrees(x, y),
-        name : 'Point that scales',
-        description :
-          'n1ql: ' +  data1.results[1].nodes.services.n1ql + '<br/>' +
-          'kv: ' + data1.results[1].nodes.services.kv + '<br/>',
-        point : {
-            pixelSize : 10,
-            color : Cesium.Color.BLUE,
-            //image : 'https://blog.couchbase.com/wp-content/uploads/2017/02/cropped-Couchbase-Blog-lockup.png',
-            scaleByDistance : new Cesium.NearFarScalar(1.5e2, 2.0, 1.5e7, 0.5)
-        }
-      });
-    }
-
-    var i = 0;
-    while (i < 360) {
-      var r = (Math.random() * 180.0) - 90.0;
-      addPoint(i, r)
-      i = i + 1
-    }
-*/
-    
-
-
-
-    var n1qlEl = document.getElementById("demo2");
+    var n1qlEl = document.getElementById("n1ql");
 
     function loadValues() {
       //query to find total enterprise customers
@@ -184,7 +155,7 @@
           console.log("response: " + response.results[0])
           console.log(response.results[0])
           n1qlEl.innerHTML = JSON.stringify(response.results[0], null, 2);
-          addResults(response.results);
+          addResults(response.results, "count", 1000000);
           return response.results[0]
         } else {
           // handle query errors here
