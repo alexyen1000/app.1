@@ -35,18 +35,23 @@
       img.logo {
         margin-top: 10px;
       }
+
+      .stage {
+        display: flex;
+        flex-direction: row-reverse;
+      }
+
+      .cesium-viewer-bottom .cesium-widget-credits {
+        display: none;
+      }
+
+      .globalInfo {
+        margin-left: 10px;
+      }
   </style>
 </head>
 
 <body>
-  <style type="text/css">
-  .stage {
-    display: flex;
-    flex-direction: row-reverse;
-  }
-  .cesium-viewer-bottom .cesium-widget-credits {
-    display: none;
-  </style>
   <!--Splits into 2 panels-->
   <div class="stage", style="height:100%">
     <div>
@@ -54,12 +59,16 @@
            class="logo">
 
       <h1>Global Information</h1>
-      <button onclick="togglePause()">
-        Pause
-      </button>
-      <p> N1QL: <pre id="demo2"></pre></p>
-      KV: <p id="demo3"></p>
-      Index: <p id="demo4"></p>
+
+      <div class="globalInfo">
+        <button onclick="togglePause()">
+          Pause
+        </button>
+        
+        <p> N1QL: <pre id="demo2"></pre></p>
+        KV: <p id="demo3"></p>
+        Index: <p id="demo4"></p>
+      </div>
     </div>
     <div id="cesiumContainer"></div>
   </div>
