@@ -9,6 +9,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no">
   <title>Phone Home Data</title>
   <script src="../Build/Cesium/Cesium.js"></script>
+  <script src="../node_modules/lodash/lodash.js"></script>
   <style>
       @import url(../Build/Cesium/Widgets/widgets.css);
       html, body, #cesiumContainer {
@@ -89,10 +90,11 @@
     setInterval(fly, 20)
 
     //Function for plotting points
-    function addResult(result, fieldName, factor) {
+    function addResult(result, path, factor) {
+      var amount = _.get(result, path, 0)
       var surfacePosition = Cesium.Cartesian3.fromDegrees(result.longitude, result.latitude, 0);
-      var heightPosition = Cesium.Cartesian3.fromDegrees(result.longitude, result.latitude, Math.sqrt(result[fieldName]) * factor);
-      var color = Cesium.Color.fromHsl((1.0 - (result.count * 0.013)), 1.0, 0.5);
+      var heightPosition = Cesium.Cartesian3.fromDegrees(result.longitude, result.latitude, Math.sqrt(amount) * factor);
+      var color = Cesium.Color.fromHsl((1.0 - (amount * 0.013)), 1.0, 0.5);
       //Green/blue color shceme: (0.55 - (result.count * 0.013)), 1.0, 0.5
       //Red/purple color scheme: (1.0 - (result.count * 0.013)), 1.0, 0.5
 
@@ -113,9 +115,9 @@
     }
     var i = 0;
     //Plot lat/lon of phonehome data
-    function addResults(results, fieldName, factor) {
+    function addResults(results, path, factor) {
       while (i < results.length) {
-        addResult(results[i], fieldName, factor)
+        addResult(results[i], path, factor)
         i = i + 1
       }
     }
@@ -145,6 +147,7 @@
         }]
       })
 
+      //Requests server for data
       var xhttp = new XMLHttpRequest();
       xhttp.onreadystatechange = function() {
         console.log("xhttp.responseText: " + xhttp.responseText);
@@ -155,6 +158,7 @@
           console.log("response: " + response.results[0])
           console.log(response.results[0])
           n1qlEl.innerHTML = JSON.stringify(response.results[0], null, 2);
+          //Plots the lines
           addResults(response.results, "count", 1000000);
           return response.results[0]
         } else {
