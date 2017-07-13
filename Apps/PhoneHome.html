@@ -125,16 +125,22 @@
     var n1qlEl = document.getElementById("n1ql");
 
     function loadValues() {
-      //query to find total enterprise customers
-      var globalQuery;
-      globalQuery = "SELECT COUNT(phonehome.version) AS enterprise FROM phonehome_sample WHERE phonehome.version LIKE \"%enterprise\""
-      //loadDoc(query);
-
+      //Query to find data to plot onto the map
       var mapQuery;
       mapQuery = "SELECT phonehome.geo.latitude, phonehome.geo.longitude, phonehome.geo.cityName, phonehome.geo.countryCode, phonehome.nodes.services, phonehome.addr, phonehome.active_version, phonehome.version, phonehome.isEnterpriseEdition, COUNT(*) AS count FROM phonehome_sample GROUP BY phonehome.geo.latitude, phonehome.geo.longitude, phonehome.geo.cityName, phonehome.geo.countryCode, phonehome.nodes.services, phonehome.addr, phonehome.active_version, phonehome.version, phonehome.isEnterpriseEdition ORDER BY phonehome.geo.latitude ASC"
       loadDoc(mapQuery);
+
+      //Query to find total enterprise customers
+      var enterpriseQuery;
+      enterpriseQuery = "SELECT COUNT(phonehome.version) AS enterprise FROM phonehome_sample WHERE phonehome.version LIKE \"%enterprise\""
+
+      //Query to find global data
+      var globalQuery;
+      globalQuery = "SELECT COUNT(phonehome.nodes.services.`index`) AS indexnodes, SUM(phonehome.nodes.services.kv) AS kvnodes, SUM(phonehome.nodes.services.n1ql) AS n1qlnodes, COUNT(phonehome.active_version) AS activenodes FROM phonehome_sample WHERE phonehome.active_version = true;"
+      loadGlobal(globalQuery);      
     };
 
+    //Loads map data
     function loadDoc(query) {
       console.log(query)
 
@@ -157,7 +163,6 @@
           var response = JSON.parse(this.responseText)
           console.log("response: " + response.results[0])
           console.log(response.results[0])
-          n1qlEl.innerHTML = JSON.stringify(response.results[0], null, 2);
           //Plots the lines
           addResults(response.results, "count", 1000000);
           return response.results[0]
@@ -171,6 +176,43 @@
       xhttp.setRequestHeader("Content-Type", "application/json");
       xhttp.send(json_req);
     };
+
+    //Loads global data
+    function loadGlobal(query) {
+      console.log(query)
+
+      // Parse the JSON string to send REST API request
+      var json_req = JSON.stringify({
+        "statement": query,
+        "creds": [{
+          "user": "Administrator",
+          "pass": "password"
+        }]
+      })
+
+      //Requests server for data
+      var xhttp = new XMLHttpRequest();
+      xhttp.onreadystatechange = function() {
+        console.log("xhttp.responseText: " + xhttp.responseText);
+        console.log("xhttp.status: " + xhttp.status);
+
+        if (this.readyState >= 3 && this.status == 200) {
+          var gdata = JSON.parse(this.responseText)
+          console.log("gdata: " + gdata.results[0])
+          console.log(gdata.results[0])
+          n1qlEl.innerHTML = JSON.stringify(gdata.results[0], null, 2);
+          return gdata.results[0]
+        } else {
+          // handle query errors here
+          console.log("xhttp error")
+          }
+      };
+
+      xhttp.open("POST", "http://localhost:8080/proxy/http://Administrator:password@172.23.99.8:8093/query/service");
+      xhttp.setRequestHeader("Content-Type", "application/json");
+      xhttp.send(json_req);
+    };
+
     loadValues();
   </script>
 </body>
