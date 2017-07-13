@@ -19,9 +19,9 @@
         background-color: white;
       }
 
-      h1{
-        margin-top: 10px;
-        margin-bottom: 0px;
+      h1 {
+        margin-top: 8px;
+        margin-bottom: 10px;
         color: black;
         padding-top: 10px;
         padding-bottom: 10px;
@@ -29,13 +29,15 @@
         background-color: rgb(242, 242, 242);
         font-family: verdana;
         font-size: 20px;
+        border-bottom: 2px solid rgb(240, 2, 73);
       }
 
-      image {
+      img.logo {
+        margin-top: 10px;
       }
-
   </style>
 </head>
+
 <body>
   <style type="text/css">
   .stage {
@@ -45,17 +47,13 @@
   .cesium-viewer-bottom .cesium-widget-credits {
     display: none;
   </style>
-
   <!--Splits into 2 panels-->
   <div class="stage", style="height:100%">
     <div>
-      <image>
-        <img src="https://cdn.worldvectorlogo.com/logos/couchbase.svg" alt="logo" width=400 height="50">
-      </image>
+      <img src="https://cdn.worldvectorlogo.com/logos/couchbase.svg" width=400 height="50"
+           class="logo">
+
       <h1>Global Information</h1>
-      <svg height="25" width=100%>
-        <line x1="0" y1="0" x2=100% y2="0" style="stroke:rgb(240, 2, 73);stroke-width:4" />
-      </svg>
       <button onclick="togglePause()">
         Pause
       </button>
