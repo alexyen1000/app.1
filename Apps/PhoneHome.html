@@ -44,7 +44,6 @@
   }
   .cesium-viewer-bottom .cesium-widget-credits {
     display: none;
-  }
   </style>
 
   <!--Splits into 2 panels-->
@@ -122,9 +121,6 @@
 */
 
     //Function for plotting points
-    var n1ql = 0
-    var kv = 0
-
     function addResult(result) {
       var surfacePosition = Cesium.Cartesian3.fromDegrees(result.longitude, result.latitude, 0);
       var heightPosition = Cesium.Cartesian3.fromDegrees(result.longitude, result.latitude, Math.sqrt(result.count) * 1000000);
@@ -142,8 +138,6 @@
         position: Cesium.Cartesian3.fromDegrees(i, 40),
         name : result.addr,
         description : 
-          'n1ql: ' +  n1ql + '<br/>' +
-          'kv: ' + kv + '<br/>' +
           '<pre>' + JSON.stringify(result, null, 2) + '</pre>',
         polyline : polyline
       });
