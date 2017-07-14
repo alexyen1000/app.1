@@ -59,7 +59,6 @@
         font-weight: normal;
         width: 100%;
         text-align: left;
-        margin-bottom: 10px;
       }
 
       td {
@@ -296,12 +295,12 @@
 
     //Query to find data to plot onto the map
     var mapQuery;
-    mapQuery = "SELECT phonehome.geo.latitude, phonehome.geo.longitude, phonehome.geo.cityName, phonehome.geo.countryCode, phonehome.nodes.services, phonehome.addr, phonehome.active_version, phonehome.version, phonehome.isEnterpriseEdition, COUNT(*) AS count FROM phonehome_sample GROUP BY phonehome.geo.latitude, phonehome.geo.longitude, phonehome.geo.cityName, phonehome.geo.countryCode, phonehome.nodes.services, phonehome.addr, phonehome.active_version, phonehome.version, phonehome.isEnterpriseEdition ORDER BY phonehome.geo.latitude ASC"
+    mapQuery = "SELECT phonehome.geo.latitude, phonehome.geo.longitude, phonehome.geo.cityName, phonehome.geo.countryCode, phonehome.nodes.services, phonehome.addr, phonehome.active_version, phonehome.version, phonehome.isEnterpriseEdition, COUNT(*) AS count FROM phonehome_sample GROUP BY phonehome.geo.latitude, phonehome.geo.longitude, phonehome.geo.cityName, phonehome.geo.countryCode, phonehome.nodes.services, phonehome.addr, phonehome.active_version, phonehome.version, phonehome.isEnterpriseEdition ORDER BY phonehome.geo.latitude ASC LIMIT 1000;"
     loadDoc(mapQuery);
 
     //Query to find global data
     var globalQuery;
-    globalQuery = "SELECT COUNT(phonehome.nodes.services.`index`) AS indexnodes, SUM(phonehome.nodes.services.kv) AS kvnodes, SUM(phonehome.nodes.services.n1ql) AS n1qlnodes, COUNT(phonehome.active_version) AS activenodes FROM phonehome_sample WHERE phonehome.active_version = true;"
+    globalQuery = "SELECT COUNT(phonehome.nodes.services.`index`) AS indexnodes, SUM(phonehome.nodes.services.kv) AS kvnodes, SUM(phonehome.nodes.services.n1ql) AS n1qlnodes, COUNT(phonehome.active_version) AS activenodes FROM phonehome_sample WHERE phonehome.active_version = true LIMIT 1000;"
     loadGlobal(globalQuery);      
   </script>
 </body>
