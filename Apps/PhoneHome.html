@@ -21,20 +21,22 @@
       }
 
       h1 {
-        margin-top: 8px;
+        margin-top: 10px;
         margin-bottom: 10px;
         color: black;
         padding-top: 10px;
         padding-bottom: 10px;
         text-align: center;
-        background-color: rgb(242, 242, 242);
+        background-color: rgb(240, 240, 240);
         font-family: verdana;
         font-size: 20px;
-        border-bottom: 2px solid rgb(240, 2, 73);
+        border-bottom: 2px solid rgb(240, 5, 70);
       }
 
       img.logo {
+        margin: auto;
         margin-top: 10px;
+        display: block;
       }
 
       .stage {
@@ -48,6 +50,20 @@
 
       .globalInfo {
         margin-left: 10px;
+      }
+
+      table {
+        border: none;
+        font-family: verdana;
+        font-size: 15px;
+        font-weight: normal;
+        width: 100%;
+        text-align: left;
+        margin-bottom: 10px;
+      }
+
+      td {
+        padding-top: 20px;
       }
   </style>
 </head>
@@ -66,9 +82,34 @@
           Pause
         </button>
 
-        <p> N1QL: <pre id="n1ql"></pre></p>
-        KV: <p id="demo3"></p>
-        Index: <p id="demo4"></p>
+        <table>
+          <tr>
+            <td>Active Versions</td>
+            <td id="active"></td>
+          </tr>
+          <tr>
+            <td>N1QL</td>
+            <td id="n1ql"></td>
+          </tr>
+          <tr>
+            <td>KV</td>
+            <td id="kv"></td>
+          </tr>
+          <tr>
+            <td>Index</td>
+            <td id="index"></td>
+          </tr>
+          <tr>
+            <td>Enterprise</td>
+            <td>Community</td>
+          </tr>
+        </table>
+
+        <svg height="210" width="500">
+          <line x1="4" y1="0" x2="370" y2="0" style="stroke:rgb(5, 100, 240);stroke-width:50" />
+          <line x1="4" y1="0" x2="363.61" y2="0" style="stroke:rgb(240, 5, 70);stroke-width:50" />
+        </svg>
+
       </div>
     </div>
     <div id="cesiumContainer"></div>
@@ -94,8 +135,8 @@
       var amount = _.get(result, path, 0)
       var surfacePosition = Cesium.Cartesian3.fromDegrees(result.longitude, result.latitude, 0);
       var heightPosition = Cesium.Cartesian3.fromDegrees(result.longitude, result.latitude, Math.sqrt(amount) * factor);
-      var color = Cesium.Color.fromHsl((1.0 - (amount * 0.013)), 1.0, 0.5);
-      //Green/blue color shceme: (0.55 - (result.count * 0.013)), 1.0, 0.5
+      var color = Cesium.Color.fromHsl((1.0 - (result.count * 0.013)), 1.0, 0.5);
+      //Green/blue color scheme: (0.55 - (result.count * 0.013)), 1.0, 0.5
       //Red/purple color scheme: (1.0 - (result.count * 0.013)), 1.0, 0.5
 
       var polyline = new Cesium.PolylineGraphics();
@@ -122,7 +163,12 @@
       }
     }
 
+    //Variables to parse into global data
+    var activeEl = document.getElementById("active");
     var n1qlEl = document.getElementById("n1ql");
+    var kvEl = document.getElementById("kv");
+    var indexEl = document.getElementById("index");
+    var enterpriseEl = document.getElementById("enterprise")
 
     function loadValues() {
       //Query to find data to plot onto the map
@@ -133,6 +179,7 @@
       //Query to find total enterprise customers
       var enterpriseQuery;
       enterpriseQuery = "SELECT COUNT(phonehome.version) AS enterprise FROM phonehome_sample WHERE phonehome.version LIKE \"%enterprise\""
+      loadEnterprise(enterpriseQuery);
 
       //Query to find global data
       var globalQuery;
@@ -171,7 +218,6 @@
           console.log("xhttp error")
           }
       };
-
       xhttp.open("POST", "http://localhost:8080/proxy/http://Administrator:password@172.23.99.8:8093/query/service");
       xhttp.setRequestHeader("Content-Type", "application/json");
       xhttp.send(json_req);
@@ -200,14 +246,55 @@
           var gdata = JSON.parse(this.responseText)
           console.log("gdata: " + gdata.results[0])
           console.log(gdata.results[0])
-          n1qlEl.innerHTML = JSON.stringify(gdata.results[0], null, 2);
+
+          activeEl.innerHTML = JSON.stringify(gdata.results[0].activenodes);
+          n1qlEl.innerHTML = JSON.stringify(gdata.results[0].n1qlnodes);
+          kvEl.innerHTML = JSON.stringify(gdata.results[0].kvnodes);
+          indexEl.innerHTML = JSON.stringify(gdata.results[0].indexnodes);
+
           return gdata.results[0]
         } else {
           // handle query errors here
           console.log("xhttp error")
           }
       };
+      xhttp.open("POST", "http://localhost:8080/proxy/http://Administrator:password@172.23.99.8:8093/query/service");
+      xhttp.setRequestHeader("Content-Type", "application/json");
+      xhttp.send(json_req);
+    };
 
+    //Loads enterprise data
+    function loadEnterprise(query) {
+      console.log(query)
+
+      // Parse the JSON string to send REST API request
+      var json_req = JSON.stringify({
+        "statement": query,
+        "creds": [{
+          "user": "Administrator",
+          "pass": "password"
+        }]
+      })
+
+      //Requests server for data
+      var xhttp = new XMLHttpRequest();
+      xhttp.onreadystatechange = function() {
+        console.log("xhttp.responseText: " + xhttp.responseText);
+        console.log("xhttp.status: " + xhttp.status);
+
+        if (this.readyState >= 3 && this.status == 200) {
+          var edata = JSON.parse(this.responseText)
+          console.log("edata: " + edata.results[0])
+          console.log(edata.results[0])
+
+          enterpriseEl.innerHTML = JSON.stringify(edata.results[0].enterprise) * 370 / JSON.stringify(results.length) ;
+
+          return edata.results[0]
+        } else {
+          // handle query errors here
+          console.log("xhttp error")
+          }
+      };
       xhttp.open("POST", "http://localhost:8080/proxy/http://Administrator:password@172.23.99.8:8093/query/service");
       xhttp.setRequestHeader("Content-Type", "application/json");
       xhttp.send(json_req);
