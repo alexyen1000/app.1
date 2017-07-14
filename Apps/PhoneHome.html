@@ -63,7 +63,7 @@
       }
 
       td {
-        padding-top: 20px;
+        padding-top: 25px;
       }
   </style>
 </head>
@@ -105,24 +105,22 @@
           </tr>
         </table>
 
-        <svg height="210" width="500">
-          <line x1="4" y1="0" x2="370" y2="0" style="stroke:rgb(5, 100, 240);stroke-width:50" />
-          <line x1="4" y1="0" x2="363.61" y2="0" style="stroke:rgb(240, 5, 70);stroke-width:50" />
-        </svg>
-
+        <svg height="210" width="500" id="barChart"></svg>
       </div>
     </div>
+
     <div id="cesiumContainer"></div>
   </div>
 
   <script>
     var viewer = new Cesium.Viewer('cesiumContainer', {timeline : false, animation : false});
-    var spinHeight = viewer.camera.positionCartographic.height - 10000;
+
     var pause = false;
     function togglePause() {
       pause = !pause
     }
 
+    var spinHeight = viewer.camera.positionCartographic.height - 10000;
     function fly() {
       if (!pause && viewer.camera.positionCartographic.height >= spinHeight) {
         viewer.camera.rotate(new Cesium.Cartesian3(0.0, 0.0, 1.0), 0.0005)
@@ -133,9 +131,11 @@
     //Function for plotting points
     function addResult(result, path, factor) {
       var amount = _.get(result, path, 0)
+
       var surfacePosition = Cesium.Cartesian3.fromDegrees(result.longitude, result.latitude, 0);
       var heightPosition = Cesium.Cartesian3.fromDegrees(result.longitude, result.latitude, Math.sqrt(amount) * factor);
       var color = Cesium.Color.fromHsl((1.0 - (result.count * 0.013)), 1.0, 0.5);
+
       //Green/blue color scheme: (0.55 - (result.count * 0.013)), 1.0, 0.5
       //Red/purple color scheme: (1.0 - (result.count * 0.013)), 1.0, 0.5
 
@@ -152,8 +152,8 @@
           '<pre>' + JSON.stringify(result, null, 2) + '</pre>',
         polyline : polyline
       });
-      
     }
+
     var i = 0;
     //Plot lat/lon of phonehome data
     function addResults(results, path, factor) {
@@ -168,24 +168,8 @@
     var n1qlEl = document.getElementById("n1ql");
     var kvEl = document.getElementById("kv");
     var indexEl = document.getElementById("index");
-    var enterpriseEl = document.getElementById("enterprise")
 
-    function loadValues() {
-      //Query to find data to plot onto the map
-      var mapQuery;
-      mapQuery = "SELECT phonehome.geo.latitude, phonehome.geo.longitude, phonehome.geo.cityName, phonehome.geo.countryCode, phonehome.nodes.services, phonehome.addr, phonehome.active_version, phonehome.version, phonehome.isEnterpriseEdition, COUNT(*) AS count FROM phonehome_sample GROUP BY phonehome.geo.latitude, phonehome.geo.longitude, phonehome.geo.cityName, phonehome.geo.countryCode, phonehome.nodes.services, phonehome.addr, phonehome.active_version, phonehome.version, phonehome.isEnterpriseEdition ORDER BY phonehome.geo.latitude ASC"
-      loadDoc(mapQuery);
-
-      //Query to find total enterprise customers
-      var enterpriseQuery;
-      enterpriseQuery = "SELECT COUNT(phonehome.version) AS enterprise FROM phonehome_sample WHERE phonehome.version LIKE \"%enterprise\""
-      loadEnterprise(enterpriseQuery);
-
-      //Query to find global data
-      var globalQuery;
-      globalQuery = "SELECT COUNT(phonehome.nodes.services.`index`) AS indexnodes, SUM(phonehome.nodes.services.kv) AS kvnodes, SUM(phonehome.nodes.services.n1ql) AS n1qlnodes, COUNT(phonehome.active_version) AS activenodes FROM phonehome_sample WHERE phonehome.active_version = true;"
-      loadGlobal(globalQuery);      
-    };
+    var gdata
 
     //Loads map data
     function loadDoc(query) {
@@ -203,15 +187,13 @@
       //Requests server for data
       var xhttp = new XMLHttpRequest();
       xhttp.onreadystatechange = function() {
-        console.log("xhttp.responseText: " + xhttp.responseText);
         console.log("xhttp.status: " + xhttp.status);
 
         if (this.readyState >= 3 && this.status == 200) {
           var response = JSON.parse(this.responseText)
-          console.log("response: " + response.results[0])
-          console.log(response.results[0])
           //Plots the lines
           addResults(response.results, "count", 1000000);
+
           return response.results[0]
         } else {
           // handle query errors here
@@ -243,9 +225,14 @@
         console.log("xhttp.status: " + xhttp.status);
 
         if (this.readyState >= 3 && this.status == 200) {
-          var gdata = JSON.parse(this.responseText)
+          gdata = JSON.parse(this.responseText)
           console.log("gdata: " + gdata.results[0])
           console.log(gdata.results[0])
+
+          //Query to find total enterprise customers
+          var enterpriseQuery;
+          enterpriseQuery = "SELECT COUNT(phonehome.version) AS enterprise FROM phonehome_sample WHERE phonehome.version LIKE \"%enterprise\""
+          loadEnterprise(enterpriseQuery);
 
           activeEl.innerHTML = JSON.stringify(gdata.results[0].activenodes);
           n1qlEl.innerHTML = JSON.stringify(gdata.results[0].n1qlnodes);
@@ -287,7 +274,14 @@
           console.log("edata: " + edata.results[0])
           console.log(edata.results[0])
 
-          enterpriseEl.innerHTML = JSON.stringify(edata.results[0].enterprise) * 370 / JSON.stringify(results.length) ;
+          var barWidth = 370
+          var pct = 1.0 * edata.results[0].enterprise / (1.0 * gdata.results[0].activenodes)
+          var pctWidth = barWidth * pct
+
+          var barChartEl = document.getElementById("barChart");
+          barChartEl.innerHTML = 
+            '<line x1="4" y1="0" x2="' + barWidth + '" y2="0" style="stroke:rgb(5, 100, 240);stroke-width:50" />' +
+            '<line x1="4" y1="0" x2="' + pctWidth + '" y2="0" style="stroke:rgb(240, 5, 70);stroke-width:50" />'
 
           return edata.results[0]
         } else {
@@ -300,7 +294,15 @@
       xhttp.send(json_req);
     };
 
-    loadValues();
+    //Query to find data to plot onto the map
+    var mapQuery;
+    mapQuery = "SELECT phonehome.geo.latitude, phonehome.geo.longitude, phonehome.geo.cityName, phonehome.geo.countryCode, phonehome.nodes.services, phonehome.addr, phonehome.active_version, phonehome.version, phonehome.isEnterpriseEdition, COUNT(*) AS count FROM phonehome_sample GROUP BY phonehome.geo.latitude, phonehome.geo.longitude, phonehome.geo.cityName, phonehome.geo.countryCode, phonehome.nodes.services, phonehome.addr, phonehome.active_version, phonehome.version, phonehome.isEnterpriseEdition ORDER BY phonehome.geo.latitude ASC"
+    loadDoc(mapQuery);
+
+    //Query to find global data
+    var globalQuery;
+    globalQuery = "SELECT COUNT(phonehome.nodes.services.`index`) AS indexnodes, SUM(phonehome.nodes.services.kv) AS kvnodes, SUM(phonehome.nodes.services.n1ql) AS n1qlnodes, COUNT(phonehome.active_version) AS activenodes FROM phonehome_sample WHERE phonehome.active_version = true;"
+    loadGlobal(globalQuery);      
   </script>
 </body>
 </html>
