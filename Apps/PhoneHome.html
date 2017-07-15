@@ -133,10 +133,10 @@
 
       var surfacePosition = Cesium.Cartesian3.fromDegrees(result.longitude, result.latitude, 0);
       var heightPosition = Cesium.Cartesian3.fromDegrees(result.longitude, result.latitude, Math.sqrt(amount) * factor);
-      var color = Cesium.Color.fromHsl((1.0 - (result.count * 0.013)), 1.0, 0.5);
+      var color = Cesium.Color.fromHsl((0.55 - (result.count * 0.00005)), 1.0, 0.5);
 
-      //Green/blue color scheme: (0.55 - (result.count * 0.013)), 1.0, 0.5
-      //Red/purple color scheme: (1.0 - (result.count * 0.013)), 1.0, 0.5
+      //Green/blue color scheme: (0.55 - (result.count * 0.001)), 1.0, 0.5
+      //Red/purple color scheme: (1.0 - (result.count * 0.001)), 1.0, 0.5
 
       var polyline = new Cesium.PolylineGraphics();
             polyline.material = new Cesium.ColorMaterialProperty(color);
@@ -189,11 +189,19 @@
         console.log("xhttp.status: " + xhttp.status);
 
         if (this.readyState >= 3 && this.status == 200) {
-          var response = JSON.parse(this.responseText)
-          //Plots the lines
-          addResults(response.results, "count", 1000000);
+          
+          try {
+            var response = JSON.parse(this.responseText)
+            //Plots the lines
+            addResults(response.results, "count", 100000);
 
-          return response.results[0]
+            return response.results[0]
+          } catch(e) {
+            console.log("error data not in JSON format")
+        }
+
+          
+         
         } else {
           // handle query errors here
           console.log("xhttp error")
@@ -230,7 +238,7 @@
 
           //Query to find total enterprise customers
           var enterpriseQuery;
-          enterpriseQuery = "SELECT COUNT(phonehome.version) AS enterprise FROM phonehome_sample WHERE phonehome.version LIKE \"%enterprise\""
+          enterpriseQuery = "SELECT COUNT(1) AS enterprise FROM phonehome_sample WHERE isEnterpriseEdition = true"
           loadEnterprise(enterpriseQuery);
 
           activeEl.innerHTML = JSON.stringify(gdata.results[0].activenodes);
@@ -295,12 +303,12 @@
 
     //Query to find data to plot onto the map
     var mapQuery;
-    mapQuery = "SELECT phonehome.geo.latitude, phonehome.geo.longitude, phonehome.geo.cityName, phonehome.geo.countryCode, phonehome.nodes.services, phonehome.addr, phonehome.active_version, phonehome.version, phonehome.isEnterpriseEdition, COUNT(*) AS count FROM phonehome_sample GROUP BY phonehome.geo.latitude, phonehome.geo.longitude, phonehome.geo.cityName, phonehome.geo.countryCode, phonehome.nodes.services, phonehome.addr, phonehome.active_version, phonehome.version, phonehome.isEnterpriseEdition ORDER BY phonehome.geo.latitude ASC LIMIT 1000;"
+    mapQuery = "SELECT geo.latitude, geo.longitude, geo.cityName, geo.countryCode, nodes.services, addr,active_version, version, isEnterpriseEdition, COUNT(1) AS count FROM phonehome_sample WHERE geo.latitude IS NOT NULL GROUP BY geo.latitude, geo.longitude, geo.cityName, geo.countryCode, nodes.services, addr, active_version, version, isEnterpriseEdition ORDER BY geo.latitude ASC"
     loadDoc(mapQuery);
 
     //Query to find global data
     var globalQuery;
-    globalQuery = "SELECT COUNT(phonehome.nodes.services.`index`) AS indexnodes, SUM(phonehome.nodes.services.kv) AS kvnodes, SUM(phonehome.nodes.services.n1ql) AS n1qlnodes, COUNT(phonehome.active_version) AS activenodes FROM phonehome_sample WHERE phonehome.active_version = true LIMIT 1000;"
+    globalQuery = "SELECT SUM(CASE WHEN CONTAINS(o.name,'kv') = true THEN o.val ELSE 0 END) kvnodes, SUM(CASE WHEN CONTAINS(o.name,'index') = true THEN o.val ELSE 0 END)  indexnodes, SUM(CASE WHEN CONTAINS(o.name,'n1ql') = true THEN o.val ELSE 0 END)   n1qlnodes, COUNT(DISTINCT META(p).id) activenodes FROM phonehome_sample AS p UNNEST OBJECT_PAIRS(p.nodes.services) AS o WHERE p.active_version = true AND p.nodes.services IS NOT NULL;"
     loadGlobal(globalQuery);      
   </script>
 </body>
