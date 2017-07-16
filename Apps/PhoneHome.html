@@ -191,23 +191,19 @@
         console.log("xhttp.status: " + xhttp.status);
 
         if (this.readyState >= 3 && this.status == 200) {
-          
           try {
             var response = JSON.parse(this.responseText)
             //Plots the lines
             addResults(response.results, "count", 100000);
 
             return response.results[0]
-          } catch(e) {
-            console.log("error data not in JSON format")
-        }
-
-          
-         
+          } catch (e) {
+            console.log("data not in JSON format")
+          }
         } else {
           // handle query errors here
           console.log("xhttp error")
-          }
+        }
       };
       xhttp.open("POST", "http://localhost:8080/proxy/http://Administrator:password@172.23.99.8:8093/query/service");
       xhttp.setRequestHeader("Content-Type", "application/json");
