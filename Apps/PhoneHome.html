@@ -77,8 +77,14 @@
       <h1>Global Information</h1>
 
       <div class="globalInfo">
+        <!--Button to toggle spin-->
         <button onclick="togglePause()">
-          Pause
+          Spin
+        </button>
+
+        <!--Button to toggle lighting-->
+        <button onclick="toggleLighting()">
+          Shadow
         </button>
 
         <table>
@@ -114,9 +120,16 @@
   <script>
     var viewer = new Cesium.Viewer('cesiumContainer', {timeline : false, animation : false});
 
+    //Function that toggles spin
     var pause = false;
     function togglePause() {
       pause = !pause
+    }
+
+    //Function that toggles lighting
+    viewer.scene.globe.enableLighting = false;
+    function toggleLighting() {
+      viewer.scene.globe.enableLighting = !viewer.scene.globe.enableLighting
     }
 
     //Spins the globe
