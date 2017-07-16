@@ -119,13 +119,15 @@
       pause = !pause
     }
 
+    //Spins the globe
     var spinHeight = viewer.camera.positionCartographic.height - 10000;
     function fly() {
-      if (!pause && viewer.camera.positionCartographic.height >= spinHeight) {
+      if (!pause && viewer.camera.positionCartographic.height >= spinHeight && viewer.scene.mode == Cesium.SceneMode.SCENE3D) {
         viewer.camera.rotate(new Cesium.Cartesian3(0.0, 0.0, 1.0), 0.0005)
       }
     }
     setInterval(fly, 20)
+
 
     //Function for plotting points
     function addResult(result, path, factor) {
