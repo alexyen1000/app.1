@@ -18,6 +18,8 @@
 
       body {
         background-color: white;
+        font-family: verdana;
+        font-size: 15px;
       }
 
       h1 {
@@ -28,7 +30,6 @@
         padding-bottom: 10px;
         text-align: center;
         background-color: rgb(240, 240, 240);
-        font-family: verdana;
         font-size: 20px;
         border-bottom: 2px solid rgb(240, 5, 70);
       }
@@ -54,8 +55,6 @@
 
       table {
         border: none;
-        font-family: verdana;
-        font-size: 15px;
         font-weight: normal;
         width: 100%;
         text-align: left;
@@ -110,7 +109,14 @@
           </tr>
         </table>
 
-        <svg height="210" width="500" id="barChart"></svg>
+        <svg height="50" width="500" id="barChart"></svg>
+
+        Plot Attribute: <select id="lineAttribute" onchange="redrawDData()">
+          <option value="count">Count</option>
+          <option value="services.n1ql">N1QL</option>
+          <option value="services.kv">KV</option>
+          <option value="services.index">Index</option>
+        </select>
       </div>
     </div>
 
@@ -170,6 +176,7 @@
     //Plot lat/lon of phonehome data
     function addResults(results, path, factor) {
       viewer.entities.suspendEvents();
+      viewer.entities.removeAll()
       var i = 0;
       while (i < results.length) {
         addResult(results[i], path, factor)
@@ -184,7 +191,8 @@
     var kvEl = document.getElementById("kv");
     var indexEl = document.getElementById("index");
 
-    var gdata
+    var gdata // global data
+    var ddata // doc data
 
     //Loads map data
     function loadDoc(query) {
@@ -207,8 +215,10 @@
         if (this.readyState >= 3 && this.status == 200) {
           try {
             var response = JSON.parse(this.responseText)
-            //Plots the lines
-            addResults(response.results, "count", 100000);
+
+            ddata = response.results
+
+            redrawDData()
 
             return response.results[0]
           } catch (e) {
@@ -323,8 +333,7 @@
     globalQuery = "SELECT SUM(CASE WHEN CONTAINS(o.name,'kv') = true THEN o.val ELSE 0 END) kvnodes, SUM(CASE WHEN CONTAINS(o.name,'index') = true THEN o.val ELSE 0 END)  indexnodes, SUM(CASE WHEN CONTAINS(o.name,'n1ql') = true THEN o.val ELSE 0 END)   n1qlnodes, COUNT(DISTINCT META(p).id) activenodes FROM phonehome_sample AS p UNNEST OBJECT_PAIRS(p.nodes.services) AS o WHERE p.active_version = true AND p.nodes.services IS NOT NULL;"
     loadGlobal(globalQuery);  
 
-    var data1 = {
-      "results": [
+    ddata = [
         {
           "geo": {
             "countryName": "Aaa",
@@ -335,13 +344,12 @@
           "latitude": 100,
           "longitude": 10,
 
-          "nodes": {
-            "services": {
-              "n1ql": 2,
-              "kv": 4
-            }
+          "services": {
+            "n1ql": 2,
+            "kv": 4
           },
-          "version": "1.2.3-enterprise"
+          "version": "1.2.3-enterprise",
+          "count": 30
         },
         {
           "geo": {
@@ -351,18 +359,22 @@
           }, 
           "latitude": 200,
           "longitude": 20,
-          "nodes": {
-            "services": {
-              "n1ql": 1,
-              "kv": 4
-            }
+          "services": {
+            "n1ql": 1,
+            "kv": 4
           },
-          "version": "1.2.3-enterprise"
+          "version": "1.2.3-enterprise",
+          "count": 10
         }
       ]
-    }
 
-  addResults(data1.results, "nodes.services.n1ql", 1000000);
+  function redrawDData() {
+    lineAttributeEl = document.getElementById("lineAttribute")
+    //Plots the lines
+    addResults(ddata, lineAttributeEl.value, 100000);
+  }
+
+  redrawDData();
   </script>
 </body>
 </html>
