@@ -111,12 +111,22 @@
 
         <svg height="50" width="500" id="barChart"></svg>
 
-        Plot Attribute: <select id="lineAttribute" onchange="redrawDData()">
+        <!--Changes what the lines are representing-->
+        Plot Attribute:
+        <select id="lineAttribute" onchange="redrawDData()">
           <option value="count">Count</option>
           <option value="services.n1ql">N1QL</option>
           <option value="services.kv">KV</option>
           <option value="services.index">Index</option>
         </select>
+
+        <!--Button to increase line height-->
+        <button onclick="adjustFactor(2.0)">
+          +
+        </button>
+        <button onclick="adjustFactor(0.5)">
+          -
+        </button>
       </div>
     </div>
 
@@ -125,6 +135,16 @@
 
   <script>
     var viewer = new Cesium.Viewer('cesiumContainer', {timeline : false, animation : false});
+
+    //Variables to parse into global data
+    var activeEl = document.getElementById("active");
+    var n1qlEl = document.getElementById("n1ql");
+    var kvEl = document.getElementById("kv");
+    var indexEl = document.getElementById("index");
+
+    var gdata // global data
+    var ddata // doc data
+    var factor = 100000
 
     //Function that toggles spin
     var pause = false;
@@ -147,6 +167,11 @@
     }
     setInterval(fly, 20)
 
+    //Function that changes line height
+    function adjustFactor(x) {
+      factor = factor * x
+      redrawDData();
+    }
 
     //Function for plotting points
     function addResult(result, path, factor) {
@@ -184,15 +209,6 @@
       }
       viewer.entities.resumeEvents();
     }
-
-    //Variables to parse into global data
-    var activeEl = document.getElementById("active");
-    var n1qlEl = document.getElementById("n1ql");
-    var kvEl = document.getElementById("kv");
-    var indexEl = document.getElementById("index");
-
-    var gdata // global data
-    var ddata // doc data
 
     //Loads map data
     function loadDoc(query) {
@@ -371,7 +387,7 @@
   function redrawDData() {
     lineAttributeEl = document.getElementById("lineAttribute")
     //Plots the lines
-    addResults(ddata, lineAttributeEl.value, 100000);
+    addResults(ddata, lineAttributeEl.value, factor);
   }
 
   redrawDData();
