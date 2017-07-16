@@ -339,6 +339,49 @@
       xhttp.send(json_req);
     };
 
+    ddata = [
+      {
+        "geo": {
+          "countryName": "Aaa",
+          "countryCode": "aaa",
+          "cityName": "denver"
+        }, 
+
+        "latitude": 100,
+        "longitude": 10,
+
+        "services": {
+          "n1ql": 2,
+          "kv": 4
+        },
+        "version": "1.2.3-enterprise",
+        "count": 30
+      },
+      {
+        "geo": {
+          "countryName": "Bbb",
+          "countryCode": "bbb",
+          "cityName": "paris"
+        }, 
+        "latitude": 200,
+        "longitude": 20,
+        "services": {
+          "n1ql": 1,
+          "kv": 4
+        },
+        "version": "1.2.3-enterprise",
+        "count": 10
+      }
+    ]
+
+    function redrawDData() {
+      lineAttributeEl = document.getElementById("lineAttribute")
+      //Plots the lines
+      addResults(ddata, lineAttributeEl.value, factor);
+    }
+
+    redrawDData();
+
     //Query to find data to plot onto the map
     var mapQuery;
     mapQuery = "SELECT geo.latitude, geo.longitude, geo.cityName, geo.countryCode, nodes.services, addr,active_version, version, isEnterpriseEdition, COUNT(1) AS count FROM phonehome_sample WHERE geo.latitude IS NOT NULL GROUP BY geo.latitude, geo.longitude, geo.cityName, geo.countryCode, nodes.services, addr, active_version, version, isEnterpriseEdition ORDER BY geo.latitude ASC"
@@ -348,49 +391,6 @@
     var globalQuery;
     globalQuery = "SELECT SUM(CASE WHEN CONTAINS(o.name,'kv') = true THEN o.val ELSE 0 END) kvnodes, SUM(CASE WHEN CONTAINS(o.name,'index') = true THEN o.val ELSE 0 END)  indexnodes, SUM(CASE WHEN CONTAINS(o.name,'n1ql') = true THEN o.val ELSE 0 END)   n1qlnodes, COUNT(DISTINCT META(p).id) activenodes FROM phonehome_sample AS p UNNEST OBJECT_PAIRS(p.nodes.services) AS o WHERE p.active_version = true AND p.nodes.services IS NOT NULL;"
     loadGlobal(globalQuery);  
-
-    ddata = [
-        {
-          "geo": {
-            "countryName": "Aaa",
-            "countryCode": "aaa",
-            "cityName": "denver"
-          }, 
-
-          "latitude": 100,
-          "longitude": 10,
-
-          "services": {
-            "n1ql": 2,
-            "kv": 4
-          },
-          "version": "1.2.3-enterprise",
-          "count": 30
-        },
-        {
-          "geo": {
-            "countryName": "Bbb",
-            "countryCode": "bbb",
-            "cityName": "paris"
-          }, 
-          "latitude": 200,
-          "longitude": 20,
-          "services": {
-            "n1ql": 1,
-            "kv": 4
-          },
-          "version": "1.2.3-enterprise",
-          "count": 10
-        }
-      ]
-
-  function redrawDData() {
-    lineAttributeEl = document.getElementById("lineAttribute")
-    //Plots the lines
-    addResults(ddata, lineAttributeEl.value, factor);
-  }
-
-  redrawDData();
   </script>
 </body>
 </html>
