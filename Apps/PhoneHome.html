@@ -112,7 +112,7 @@
         <svg height="50" width="500" id="barChart"></svg>
 
         <!--Changes what the lines are representing-->
-        Plot Attribute:
+        Line Attribute:
         <select id="lineAttribute" onchange="redrawDData()">
           <option value="count">Count</option>
           <option value="services.n1ql">N1QL</option>
@@ -178,7 +178,7 @@
       var amount = _.get(result, path, 0)
 
       var surfacePosition = Cesium.Cartesian3.fromDegrees(result.longitude, result.latitude, 0);
-      var heightPosition = Cesium.Cartesian3.fromDegrees(result.longitude, result.latitude, Math.sqrt(amount) * factor);
+      var heightPosition = Cesium.Cartesian3.fromDegrees(result.longitude, result.latitude, Math.pow(amount, 1/2) * factor);
       var color = Cesium.Color.fromHsl((0.55 - (amount * 0.00005)), 1.0, 0.5);
 
       //Green/blue color scheme: (0.55 - (result.count * 0.001)), 1.0, 0.5
@@ -210,6 +210,7 @@
       viewer.entities.resumeEvents();
     }
 
+/*
     //Loads map data
     function loadDoc(query) {
       console.log(query)
@@ -227,7 +228,6 @@
       var xhttp = new XMLHttpRequest();
       xhttp.onreadystatechange = function() {
         console.log("xhttp.status: " + xhttp.status);
-
         if (this.readyState >= 3 && this.status == 200) {
           try {
             var response = JSON.parse(this.responseText)
@@ -288,7 +288,7 @@
         } else {
           // handle query errors here
           console.log("xhttp error")
-          }
+        }
       };
       xhttp.open("POST", "http://localhost:8080/proxy/http://Administrator:password@172.23.99.8:8093/query/service");
       xhttp.setRequestHeader("Content-Type", "application/json");
@@ -338,6 +338,7 @@
       xhttp.setRequestHeader("Content-Type", "application/json");
       xhttp.send(json_req);
     };
+*/
 
     ddata = [
       {
@@ -382,15 +383,100 @@
 
     redrawDData();
 
+    //Loads map data
+    function mapF(responseText) {
+      try {
+        var response = JSON.parse(responseText)
+        ddata = response.results
+
+        redrawDData()
+
+        return response.results[0]
+      } catch (e) {
+        console.log("data not in JSON format")
+      }
+    }
+
+    //Loads global data
+    function globalF(responseText) { 
+      gdata = JSON.parse(responseText)
+      console.log("gdata: " + gdata.results[0])
+      console.log(gdata.results[0])
+
+      //Query to find total enterprise customers
+      var enterpriseQuery;
+      enterpriseQuery = "SELECT COUNT(1) AS enterprise FROM phonehome_sample WHERE isEnterpriseEdition = true"
+      loadInfo(enterpriseQuery, enterpriseF);
+
+      activeEl.innerHTML = JSON.stringify(gdata.results[0].activenodes);
+      n1qlEl.innerHTML = JSON.stringify(gdata.results[0].n1qlnodes);
+      kvEl.innerHTML = JSON.stringify(gdata.results[0].kvnodes);
+      indexEl.innerHTML = JSON.stringify(gdata.results[0].indexnodes);
+
+      return gdata.results[0]
+    }
+
+    //Loads enterprise data
+    function enterpriseF(responseText) {
+      var edata = JSON.parse(responseText)
+      console.log("edata: " + edata.results[0])
+      console.log(edata.results[0])
+
+      var barWidth = 370
+      var pct = 1.0 * edata.results[0].enterprise / (1.0 * gdata.results[0].activenodes)
+      var pctWidth = barWidth * pct
+
+      var barChartEl = document.getElementById("barChart");
+      barChartEl.innerHTML = 
+        '<line x1="4" y1="0" x2="' + barWidth + '" y2="0" style="stroke:rgb(5, 100, 240);stroke-width:50" />' +
+        '<line x1="4" y1="0" x2="' + pctWidth + '" y2="0" style="stroke:rgb(240, 5, 70);stroke-width:50" />'
+
+      return edata.results[0]
+      
+    };
+
     //Query to find data to plot onto the map
     var mapQuery;
     mapQuery = "SELECT geo.latitude, geo.longitude, geo.cityName, geo.countryCode, nodes.services, addr,active_version, version, isEnterpriseEdition, COUNT(1) AS count FROM phonehome_sample WHERE geo.latitude IS NOT NULL GROUP BY geo.latitude, geo.longitude, geo.cityName, geo.countryCode, nodes.services, addr, active_version, version, isEnterpriseEdition ORDER BY geo.latitude ASC"
-    loadDoc(mapQuery);
+    loadInfo(mapQuery, mapF);
 
     //Query to find global data
     var globalQuery;
     globalQuery = "SELECT SUM(CASE WHEN CONTAINS(o.name,'kv') = true THEN o.val ELSE 0 END) kvnodes, SUM(CASE WHEN CONTAINS(o.name,'index') = true THEN o.val ELSE 0 END)  indexnodes, SUM(CASE WHEN CONTAINS(o.name,'n1ql') = true THEN o.val ELSE 0 END)   n1qlnodes, COUNT(DISTINCT META(p).id) activenodes FROM phonehome_sample AS p UNNEST OBJECT_PAIRS(p.nodes.services) AS o WHERE p.active_version = true AND p.nodes.services IS NOT NULL;"
-    loadGlobal(globalQuery);  
+    loadInfo(globalQuery, globalF);  
+
+    //Loads enterprise data
+    function loadInfo(query, callback) {
+      console.log(query)
+
+      // Parse the JSON string to send REST API request
+      var json_req = JSON.stringify({
+        "statement": query,
+        "creds": [{
+          "user": "Administrator",
+          "pass": "password"
+        }]
+      })
+
+      //Requests server for data
+      var xhttp = new XMLHttpRequest();
+      xhttp.onreadystatechange = function() {
+        console.log("xhttp.responseText: " + xhttp.responseText);
+        console.log("xhttp.status: " + xhttp.status);
+        if (this.readyState >= 3 && this.status == 200) {
+          callback(this.responseText);
+        } else {
+          // handle query errors here
+          console.log("xhttp error")
+        }     
+      };
+      xhttp.open("POST", "http://localhost:8080/proxy/http://Administrator:password@172.23.99.8:8093/query/service");
+      xhttp.setRequestHeader("Content-Type", "application/json");
+      xhttp.send(json_req);
+    };
+
+    
+
   </script>
 </body>
 </html>
