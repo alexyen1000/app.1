@@ -71,7 +71,7 @@
 </head>
 
 <body>
-  <!--Splits into 2 panels-->
+  <!--Splits into 2 columns-->
   <div class="stage", style="height:100%">
     <div>
       <div style="position: relative; width: 0; height: 0;">
@@ -81,6 +81,7 @@
       </div>
       <img src="../../couchbase.svg" width="400" height="50" class="logo">
 
+      <!--Title-->
       <h1>Global Information</h1>
 
       <div class="globalInfo">
@@ -94,6 +95,7 @@
           Shadow
         </button>
 
+        <!--Table with no borders showing the global data-->
         <table>
           <tr>
             <td>Active Versions</td>
@@ -128,7 +130,7 @@
           <option value="services.index">Index</option>
         </select>
 
-        <!--Button to increase line height-->
+        <!--Buttons to increase/decrease line height-->
         <button onclick="adjustFactor(2.0)">
           +
         </button>
@@ -138,10 +140,12 @@
       </div>
     </div>
 
+    <!--Left div, globe-->
     <div id="cesiumContainer"></div>
   </div>
 
   <script>
+    //Cesium globe
     var viewer = new Cesium.Viewer('cesiumContainer', {timeline : false, animation : false});
 
     //Variables to parse into global data
@@ -173,6 +177,7 @@
         viewer.camera.rotate(new Cesium.Cartesian3(0.0, 0.0, 1.0), 0.0005)
       }
     }
+    //Runs fly function(spin) every 20 milliseconds
     setInterval(fly, 20)
 
     //Function that changes line height
@@ -192,6 +197,7 @@
       //Green/blue color scheme: (0.55 - (result.count * 0.00005)), 1.0, 0.5
       //Red/purple color scheme: (1.0 - (result.count * 0.00005)), 1.0, 0.5
 
+      //Cesium polylines, 2D lines that can scale easily with little resources
       var polyline = new Cesium.PolylineGraphics();
             polyline.material = new Cesium.ColorMaterialProperty(color);
             polyline.width = new Cesium.ConstantProperty(3);
@@ -218,6 +224,7 @@
       viewer.entities.resumeEvents();
     }
 
+    //Fake JSON test data to use offline
     ddata = [
       {
         "geo": {
@@ -259,6 +266,7 @@
       addResults(ddata, lineAttributeEl.value, factor);
     }
 
+    //Draws the fake data onto the map
     redrawDData();
 
     //Loads map data
