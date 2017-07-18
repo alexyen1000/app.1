@@ -154,6 +154,7 @@
     var kvEl = document.getElementById("kv");
     var indexEl = document.getElementById("index");
 
+    //Variables that fit inside other functions
     var gdata // global data
     var ddata // doc data
     var factor = 100000
@@ -164,7 +165,7 @@
       pause = !pause
     }
 
-    //Function that toggles lighting
+    //Function that toggles day/night cycle
     viewer.scene.globe.enableLighting = false;
     function toggleLighting() {
       viewer.scene.globe.enableLighting = !viewer.scene.globe.enableLighting
@@ -190,8 +191,11 @@
     function addResult(result, path, factor) {
       var amount = _.get(result, path, 0)
 
+      //Variables that dictate the properties of the polyline
       var surfacePosition = Cesium.Cartesian3.fromDegrees(result.longitude, result.latitude, 0);
+      //Height of line isn't on a linear scale, but on a fractional exponent
       var heightPosition = Cesium.Cartesian3.fromDegrees(result.longitude, result.latitude, Math.pow(amount, 1/2) * factor);
+      //Color difference isn't too drastic at lower levels due to the 1-9000 range
       var color = Cesium.Color.fromHsl((0.55 - (amount * 0.00005)), 1.0, 0.5);
 
       //Green/blue color scheme: (0.55 - (result.count * 0.00005)), 1.0, 0.5
@@ -204,6 +208,7 @@
             polyline.followSurface = new Cesium.ConstantProperty(false);
             polyline.positions = new Cesium.ConstantProperty([surfacePosition, heightPosition]);
 
+      //Adds a line
       var line = viewer.entities.add({
         name : result.addr,
         description : 
@@ -217,6 +222,7 @@
       viewer.entities.suspendEvents();
       viewer.entities.removeAll()
       var i = 0;
+      //While loop runs until it goes through all of the objects in the recieved JSON document
       while (i < results.length) {
         addResult(results[i], path, factor)
         i = i + 1
@@ -260,6 +266,7 @@
       }
     ]
 
+    //Redraws the data when called, can take upwards 20 seconds
     function redrawDData() {
       lineAttributeEl = document.getElementById("lineAttribute")
       //Plots the lines
@@ -269,7 +276,7 @@
     //Draws the fake data onto the map
     redrawDData();
 
-    //Loads map data
+    //Callback function to load map data
     function mapF(responseText) {
       try {
         var response = JSON.parse(responseText)
@@ -282,29 +289,31 @@
       }
     }
 
-    //Loads global data
+    //Callback function to load global data
     function globalF(responseText) { 
       gdata = JSON.parse(responseText)
       console.log("gdata: " + gdata.results[0])
       console.log(gdata.results[0])
 
-      //Query to find total enterprise customers
+      //Query to find total enterprise customers, also calls the enterprise function
       var enterpriseQuery;
       enterpriseQuery = "SELECT COUNT(1) AS enterprise FROM phonehome_sample WHERE isEnterpriseEdition = true"
       loadInfo(enterpriseQuery, enterpriseF);
 
+      //Replaces the null values with the actual values once the global data is recieved
       activeEl.innerHTML = JSON.stringify(gdata.results[0].activenodes);
       n1qlEl.innerHTML = JSON.stringify(gdata.results[0].n1qlnodes);
       kvEl.innerHTML = JSON.stringify(gdata.results[0].kvnodes);
       indexEl.innerHTML = JSON.stringify(gdata.results[0].indexnodes);
     }
 
-    //Loads enterprise data
+    //Callback function to load enterprise data
     function enterpriseF(responseText) {
       var edata = JSON.parse(responseText)
       console.log("edata: " + edata.results[0])
       console.log(edata.results[0])
 
+      //Bar depicts percentage of Enterprise vs Community editions
       var barWidth = 370
       var pct = 1.0 * edata.results[0].enterprise / (1.0 * gdata.results[0].activenodes)
       var pctWidth = barWidth * pct
@@ -315,7 +324,7 @@
         '<line x1="4" y1="0" x2="' + pctWidth + '" y2="0" style="stroke:rgb(240, 5, 70);stroke-width:50" />'
     };
 
-    //Loads enterprise data
+    //Function to request data from the server
     function loadInfo(query, callback) {
       console.log(query)
 
