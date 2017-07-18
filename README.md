@@ -1,5 +1,5 @@
 <p align="center">
-<img src="../couchbase.svg" width="400" height="50" class="logo">
+<img src="/couchbase.svg" width="400" height="50" class="logo">
 </p>
 
 [![Build Status](https://travis-ci.org/AnalyticalGraphicsInc/cesium.svg?branch=master)](https://travis-ci.org/AnalyticalGraphicsInc/cesium)&nbsp;
@@ -11,6 +11,7 @@ The default settings show the number of times a unique cluster givin its locatio
 
 ### Get Started ###
 
+### Features ###
 
 
 Have questions?  Ask them on the [forum](http://cesiumjs.org/forum.html).
