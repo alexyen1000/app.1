@@ -1,5 +1,5 @@
 <p align="center">
-<img src="/cropped-Couchbase-Blog-lockup.png" width="400" height="50" class="logo">
+<img src="/cropped-Couchbase-Blog-lockup.png" class="logo">
 </p>
 
 [![Build Status](https://travis-ci.org/AnalyticalGraphicsInc/cesium.svg?branch=master)](https://travis-ci.org/AnalyticalGraphicsInc/cesium)&nbsp;
