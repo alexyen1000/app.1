@@ -28,7 +28,8 @@ Our mission is to create the leading 3D globe and map for static and time-dynami
 
 We appreciate attribution by including the Cesium logo and link in your app.
 
-### Featured Demos ###
+### Features ###
 
+<img src="/project-screenshot.png" class="logo">
 
 
