@@ -2,25 +2,38 @@
 <img src="/couchbase-logo-1.png" class="logo">
 </p>
 
-[![Build Status](https://travis-ci.org/AnalyticalGraphicsInc/cesium.svg?branch=master)](https://travis-ci.org/AnalyticalGraphicsInc/cesium)&nbsp;
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](http://www.apache.org/licenses/LICENSE-2.0.html) [![Docs](https://img.shields.io/badge/docs-online-orange.svg)](http://cesiumjs.org/tutorials.html)
 
-This application displays the information from the Couchbase phonehome server, plotting vertical lines on a globe to see the information based on location.  It runs using [Cesium](http://cesiumjs.org/), which is a Javascript library for creating 3D globes and maps in a browser by using WebGL.  
+This application displays the information from the Couchbase server, plotting vertical lines on a globe to see the information based on location. It runs using [Cesium](http://cesiumjs.org/), which is a Javascript library for creating 3D globes and maps in a browser by using WebGL.  
 
-The default settings show the number of times a unique cluster givin its location, version, and other factors had been accessed by customers.  Note that the scale between lines are not linear as to keep the spectrum of line size within practical limits.
+The default settings show the number of times a unique cluster givin its location, version, and other factors had been accessed by customers. Note that the scale between lines are not linear as to keep the spectrum of line size within practical limits.
 
 ### Get Started ###
 
 ### Features ###
 
+The application displays an interactive globe that shows the location of customer data points. Clicking on one of the points will show more information about the selected location. These include:
 
-Have questions?  Ask them on the [forum](http://cesiumjs.org/forum.html).
+Version
 
-Interested in contributing?  See [CONTRIBUTING.md](CONTRIBUTING.md).
+Nodes
+
+Location
+
+IP Address
+
+Times Accessed (Count)
+
+The right hand panel shows global statistics, allowing a quick understanding of worldwide presence. Also found here is a dropdown menu to change the information that the lines represent. This can be toggled to N1QL, KV, and Index services apart from the default Count. There is also a resize function.
+
+Some graphics toggles are also available, these being the day/night cycle and the rotating globe.
+
+Some functions are built into Cesium, which can be used to change the globe into a 2D or 2.5D map, change the map texture, and bring the camera back to its original position. These are found on the globe's window.
+
 
 ### Mission ###
 
-Our mission is to create the leading 3D globe and map for static and time-dynamic content, with the best possible performance, precision, visual quality, platform support, community, and ease of use.
+Our mission is to create an easy to read visual representation of data so that employees of Couchbase can better understand  customer presence and usesage of Couchbase's products. 
 
 ### License ###
 
@@ -28,7 +41,7 @@ Our mission is to create the leading 3D globe and map for static and time-dynami
 
 We appreciate attribution by including the Cesium logo and link in your app.
 
-### Features ###
+### Screenshot ###
 
 <img src="/project-screenshot.png" class="logo">
 
