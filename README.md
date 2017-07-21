@@ -10,7 +10,7 @@ Our mission is to create an easy to read visual representation of data so that e
 
 <img src="/project-screenshot.png" class="logo">
 
-###Information###
+### Information ###
 
 This application displays the information from the Couchbase server, plotting vertical lines on a globe to see the information based on location. It runs using [Cesium](http://cesiumjs.org/), which is a Javascript library for creating 3D globes and maps in a browser by using WebGL.  
 
