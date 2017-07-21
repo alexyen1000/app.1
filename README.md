@@ -10,6 +10,14 @@ The default settings show the number of times a unique cluster givin its locatio
 
 ### Get Started ###
 
+1. Make sure to download [Node.js](https://nodejs.org/en/) and then extract the latest Cesium version [here](https://cesiumjs.org/downloads.html).
+
+2. Go to your terminal and run: $ npm install
+
+3. To launch the server, run: $ node server.js
+
+4. Launch a browser and go to this address: http://localhost:8080/Apps/PhoneHome.html
+
 ### Features ###
 
 The application displays an interactive globe that shows the location of customer data points. Clicking on one of the points will show more information about the selected location. These include:
