@@ -14,7 +14,7 @@ Our mission is to create an easy to read visual representation of data so that e
 
 This application displays the information from the Couchbase server, plotting vertical lines on a globe to see the information based on location. It runs using [Cesium](http://cesiumjs.org/), which is a Javascript library for creating 3D globes and maps in a browser by using WebGL.  
 
-The default settings show the number of times a unique cluster had been accessed given its location, version, and other factors had been accessed by customers. Note that the scale between lines are not linear as to keep the spectrum of line size within practical limits.
+The default settings show the number of times a unique cluster had been accessed given its location, version, and other factors had been accessed by customers. Note that the scale between lines are not linear as to keep the spectrum of the line size within practical limits.
 
 ### Running The App ###
 
@@ -22,7 +22,7 @@ The default settings show the number of times a unique cluster had been accessed
 
 2. In a terminal, run $node server.js
 
-3. Under the Apps folder, run Phonehome.html in your browser on a local host
+3. Under the Apps folder, run DataViewer.html in your browser on a localhost
 
 ### Features ###
 

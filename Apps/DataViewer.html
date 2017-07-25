@@ -363,6 +363,7 @@
     var globalQuery;
     globalQuery = "SELECT SUM(CASE WHEN CONTAINS(o.name,'kv') = true THEN o.val ELSE 0 END) kvnodes, SUM(CASE WHEN CONTAINS(o.name,'index') = true THEN o.val ELSE 0 END)  indexnodes, SUM(CASE WHEN CONTAINS(o.name,'n1ql') = true THEN o.val ELSE 0 END)   n1qlnodes, COUNT(DISTINCT META(p).id) activenodes FROM phonehome_sample AS p UNNEST OBJECT_PAIRS(p.nodes.services) AS o WHERE p.active_version = true AND p.nodes.services IS NOT NULL;"
     loadInfo(globalQuery, globalF);  
+
   </script>
 </body>
 </html>
